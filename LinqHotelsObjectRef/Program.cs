@@ -129,6 +129,8 @@ roomQuery = from room in rooms
             where (room.Types == 'D' || room.Types == 'F') && room.Price < 400
             orderby room.Price
             select room;
+
+roomQueryLambda = rooms.Where(room => room.Types == 'D' && room.Price < 400).OrderBy(room => room.Price);
 foreach (var room in roomQuery)
 {
     Console.WriteLine(room);
@@ -170,6 +172,7 @@ var roomQuery1 = from room in rooms select room.Price;
 Console.WriteLine((int)roomQuery1.Average());
 Console.WriteLine();
 
+Console.WriteLine(rooms.Select(room => room.Price).Average());
 
 
 //10) what is the avarage price of a room at Hotel Scandic:
@@ -180,6 +183,12 @@ var joinQuery = from room in rooms
                 on room.Hotel.HotelNo equals hotel.HotelNo
                 where hotel.Name.Equals("Scandic")
                 select room.Price;
+
+
+double joinQueryLambda = (rooms.Join(hotels, room => room.Hotel.HotelNo, hotel => hotel.HotelNo, (room, hotel) => new { room, hotel })
+                               .Where(joined => joined.hotel.Name.Equals("Scandic"))
+                               .Select(joined => joined.room.Price))
+                               .Average();
 
 Console.WriteLine((int)joinQuery.Average());
 Console.WriteLine();
@@ -197,11 +206,20 @@ Console.WriteLine();
 //12) List price and type of all rooms at Hotel Prindsen:
 Console.WriteLine("Price and type of all rooms at Hotel Prindsen: ");
 
+
+//var joinQuery1 = from room in rooms
+//                 join hotel in hotels
+//                 on room.Hotel.HotelNo equals hotel.HotelNo
+//                 where hotel.Name.Equals("Prindsen")
+//                 select new { price = room.Price, type = room.Types };
+
+//Bemærk join er IKKE nødvendigt, da Room klassen har en reference til Hotel klassen, så vi kan direkte tilgå hotellets navn
 var joinQuery1 = from room in rooms
-                 join hotel in hotels
-                 on room.Hotel.HotelNo equals hotel.HotelNo
-                 where hotel.Name.Equals("Prindsen")
-                 select new { price = room.Price, type = room.Types };
+             where room.Hotel.Name.Equals("Prindsen")
+             select new { price = room.Price, type = room.Types };
+
+var joinQueryLambda1 = rooms.Where(room => room.Hotel.Name.Equals("Prindsen"))
+                            .Select(room => new { price = room.Price, type = room.Types });
 
 foreach (var priceAndType in joinQuery1)
 {
@@ -213,13 +231,28 @@ Console.WriteLine();
 //13) List distinct price and type of all rooms at Hotel Prindsen:
 Console.WriteLine("Distinct Price and type of all rooms at Hotel Prindsen: ");
 
+//var joinQuery2 = (from room in rooms
+//                  join hotel in hotels
+//                      on room.Hotel.HotelNo equals hotel.HotelNo
+//                  where hotel.Name.Equals("Prindsen")
+//                  select new { price = room.Price, type = room.Types }).Distinct();
+
 var joinQuery2 = (from room in rooms
-                  join hotel in hotels
-                      on room.Hotel.HotelNo equals hotel.HotelNo
-                  where hotel.Name.Equals("Prindsen")
-                  select new { price = room.Price, type = room.Types }).Distinct();
+                 where room.Hotel.Name.Equals("Prindsen")
+                 select new { price = room.Price, type = room.Types }).Distinct();
+
+var joinQueryLambda2 = rooms.Where(room => room.Hotel.Name.Equals("Prindsen"))
+                            .Select(room => new { price = room.Price, type = room.Types })
+                            .Distinct();
+
 
 foreach (var priceAndType in joinQuery2)
+{
+    Console.WriteLine("Price: " + priceAndType.price + " Type: " + priceAndType.type);
+}
+Console.WriteLine();
+
+foreach (var priceAndType in joinQueryLambda2)
 {
     Console.WriteLine("Price: " + priceAndType.price + " Type: " + priceAndType.type);
 }
