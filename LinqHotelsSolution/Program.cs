@@ -1,5 +1,8 @@
 ﻿using LinqHotelsExercise;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 
 var hotels = new Hotel[]
            {
@@ -72,51 +75,88 @@ var rooms = new Room[]
 
 
 // 1) List full details of all Hotels
-var hotelsQuery = from hotel in hotels select hotel;
+var hotelsQuery = from hotel in hotels
+                  select hotel;
+
+var hotelsQueryLambda = hotels.Select(hotel => hotel);
+
+//eller blot: hotelsQuery = hotels
+
+Console.WriteLine("List full details of all Hotels");
 foreach (var hotel in hotelsQuery)
 {
     Console.WriteLine(hotel);
 }
 Console.WriteLine();
+
 
 // 2) List full details of all hotels in Roskilde
-hotelsQuery = from hotel in hotels where hotel.Address.Contains("Roskilde") select hotel;
+hotelsQuery = from hotel in hotels 
+              where hotel.Address.Contains("Roskilde") 
+              select hotel;
+
+hotelsQueryLambda = hotels.Where(hotel => hotel.Address.Contains("Roskilde"));
+
+Console.WriteLine("List full details of all hotels in Roskilde");
 foreach (var hotel in hotelsQuery)
 {
     Console.WriteLine(hotel);
 }
 Console.WriteLine();
 
+
 // 3) List the names of all hotels in Roskilde
-var hotelsQuery1 = from hotel in hotels where hotel.Address.Contains("Roskilde") select hotel.Name;
+var hotelsQuery1 = from hotel in hotels 
+                   where hotel.Address.Contains("Roskilde") 
+                   select hotel.Name;
+
+var hotelsQueryLambda1 = hotels.Where(hotel => hotel.Address.Contains("Roskilde"))
+                               .Select(hotel => hotel.Name);
+
+Console.WriteLine("List the names of all hotels in Roskilde");
 foreach (var hotel in hotelsQuery1)
 {
     Console.WriteLine(hotel);
 }
 Console.WriteLine();
 
+
 // 4)List all double rooms with a price below 400 pr night
-var roomQuery = from room in rooms where room.Types == 'D' && room.Price < 400 select room;
+var roomQuery = from room in rooms 
+                where room.Types == 'D' && room.Price < 400 
+                select room;
+
+var roomQueryLambda = rooms.Where(room => room.Types == 'D' && room.Price < 400);
+
+Console.WriteLine("List all double rooms with a price below 400 pr night");
 foreach (var room in roomQuery)
 {
     Console.WriteLine(room);
 }
 Console.WriteLine();
+
 
 // 5)List all double or family rooms with a price below 400 pr night in ascending order of price
 roomQuery = from room in rooms
             where (room.Types == 'D' || room.Types == 'F') && room.Price < 400
             orderby room.Price
             select room;
+
+roomQueryLambda = rooms.Where(room => room.Types == 'D' && room.Price < 400)
+                       .OrderBy(room => room.Price);
+
+Console.WriteLine("List all double or family rooms with a price below 400 pr night in ascending order of price");
 foreach (var room in roomQuery)
 {
     Console.WriteLine(room);
 }
 Console.WriteLine();
 
+
 // 6)List all hotels that starts with 'P'
-Console.WriteLine("All hotels that starts with P: ");
 var hotelsQuery2 = from hotel in hotels where hotel.Name.StartsWith("P") select hotel.Name;
+
+Console.WriteLine("All hotels that starts with P: ");
 foreach (var hotel in hotelsQuery2)
 {
     Console.WriteLine(hotel);
@@ -126,9 +166,11 @@ Console.WriteLine();
 
 // 7)List the number of hotels
 var hotelsQuery3 = hotels.Count();
+
 Console.WriteLine("Total no of hotels: ");
 Console.WriteLine(hotelsQuery3);
 Console.WriteLine();
+
 
 // 8)List the number of hotels in Roskilde
 var hotelsQuery4 = hotels.Count(hotel => hotel.Address.Contains("Roskilde"));
@@ -136,29 +178,46 @@ Console.WriteLine("No of hotels in Roskilde: ");
 Console.WriteLine(hotelsQuery4);
 Console.WriteLine();
 
+
 // 9)what is the avarage price of a room
-var roomQuery1 = from room in rooms select room.Price;
+var roomQuery1 = (from room in rooms 
+                 select room.Price).Average();
+
+var roomQueryLambda1 = rooms.Select(room => room.Price)
+                            .Average();
+
 Console.WriteLine("Avarage price of a room: ");
-Console.WriteLine((int)roomQuery1.Average());
+Console.WriteLine(roomQuery1);
 Console.WriteLine();
 
 
 
 //10)what is the avarage price of a room at Hotel Scandic
-var joinQuery = from room in rooms
-                join hotel in hotels
-                on room.HotelNo equals hotel.HotelNo
-                where hotel.Name.Equals("Scandic")
-                select room.Price;
+var joinQuery = (from room in rooms
+                 join hotel in hotels
+                 on room.HotelNo equals hotel.HotelNo
+                 where hotel.Name.Equals("Scandic")
+                 select room.Price).Average();
+
+double joinQueryLambda = (rooms.Join(hotels, room => room.HotelNo, hotel => hotel.HotelNo, (room, hotel) => new { room, hotel })
+                               .Where(joined => joined.hotel.Name.Equals("Scandic"))
+                               .Select(joined => joined.room.Price))
+                               .Average();
+
 
 Console.WriteLine("Avarage price of a room at Hotel Scandic: ");
-Console.WriteLine((int)joinQuery.Average());
+Console.WriteLine(joinQuery);
 Console.WriteLine();
 
+
 //11)what is the total reveneue per night from all double rooms
-roomQuery1 = from room in rooms where room.Types == 'D' select room.Price;
+roomQuery1 = (from room in rooms 
+              where room.Types == 'D' 
+              select room.Price).Sum();
+
+
 Console.WriteLine("Total reveneue from all double rooms: ");
-Console.WriteLine(roomQuery1.Sum());
+Console.WriteLine(roomQuery1);
 Console.WriteLine();
 
 //12)List distinct price and type of all rooms at Hotel Prindsen
