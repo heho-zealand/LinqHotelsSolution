@@ -81,16 +81,19 @@ foreach (var hotel in hotelsQuery)
 }
 Console.WriteLine();
 
+var hotelsQueryLamba = hotels.Select(hotel => hotel);
 
 // 2) List full details of all hotels in Roskilde:
 Console.WriteLine("Full details of all Hotels in Roskilde: ");
 
-hotelsQuery = from hotel in hotels where hotel.Address.Contains("Roskilde") select hotel;
+hotelsQuery = from hotel in hotels where hotel.Address.Contains("Roskilde") select hotel; 
 foreach (var hotel in hotelsQuery)
 {
     Console.WriteLine(hotel);
 }
 Console.WriteLine();
+
+hotelsQueryLamba = hotels.Where(hotel => hotel.Address.Contains("Roskilde"));
 
 
 // 3) List the names of all hotels in Roskilde:
@@ -103,6 +106,8 @@ foreach (var hotel in hotelsQuery1)
 }
 Console.WriteLine();
 
+var hotelsQueryLambda1 = hotels.Where(hotel => hotel.Address.Contains("Roskilde")).Select(hotel => hotel.Name);
+
 
 // 4) List all double rooms with a price below 400 pr night:
 Console.WriteLine("All double room with a pris below 400 pr night: ");
@@ -113,6 +118,8 @@ foreach (var room in roomQuery)
     Console.WriteLine(room);
 }
 Console.WriteLine();
+
+var roomQueryLambda = rooms.Where(room => room.Types == 'D' && room.Price < 400);
 
 
 // 5) List all double or family rooms with a price below 400 pr night in ascending order of price
