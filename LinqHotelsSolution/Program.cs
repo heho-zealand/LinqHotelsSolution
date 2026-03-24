@@ -142,7 +142,7 @@ roomQuery = from room in rooms
             orderby room.Price
             select room;
 
-roomQueryLambda = rooms.Where(room => room.Types == 'D' && room.Price < 400)
+roomQueryLambda = rooms.Where(room => (room.Types == 'D' || room.Types == 'F') && room.Price < 400)
                        .OrderBy(room => room.Price);
 
 Console.WriteLine("5) List all double or family rooms with a price below 400 pr night in ascending order of price:");
@@ -154,7 +154,9 @@ Console.WriteLine();
 
 
 // 6)List all hotels that starts with 'P'
-var hotelsQuery2 = from hotel in hotels where hotel.Name.StartsWith("P") select hotel.Name;
+var hotelsQuery2 = from hotel in hotels 
+                   where hotel.Name.StartsWith("P") 
+                   select hotel.Name;
 
 Console.WriteLine("6) All hotels that starts with P:");
 foreach (var hotel in hotelsQuery2)
@@ -183,8 +185,10 @@ Console.WriteLine();
 var roomQuery1 = (from room in rooms 
                  select room.Price).Average();
 
-var roomQueryLambda1 = rooms.Select(room => room.Price)
-                            .Average();
+//var roomQueryLambda1 = rooms.Select(room => room.Price)
+//                            .Average();
+
+var roomQueryLambda1 = rooms.Average(room => room.Price);
 
 Console.WriteLine("9) Avarage price of a room: ");
 Console.WriteLine(roomQuery1);
@@ -220,7 +224,7 @@ Console.WriteLine("11) Total reveneue from all double rooms: ");
 Console.WriteLine(roomQuery1);
 Console.WriteLine();
 
-//12)List distinct price and type of all rooms at Hotel Prindsen
+//12)List price and type of all rooms at Hotel Prindsen
 var joinQuery1 = from room in rooms
                  join hotel in hotels
                  on room.HotelNo equals hotel.HotelNo
